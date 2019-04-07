@@ -50,10 +50,10 @@ mesaCtrl.getMesas = async(req, res) => {
 
 }
 
-mesaCtrl.mesaOcupada = (id) => (
+mesaCtrl.mesaOcupada = (numero) => (
     new Promise((resolve, reject) => {
         let estado;
-        Mesa.find({ _id: id }, { estado: 1 }, (err, mesaDB) => {
+        Mesa.find({ numero: numero }, { estado: 1 }, (err, mesaDB) => {
             if (err) {
                 return res.status(400).json({
                     ok: false,
@@ -67,9 +67,9 @@ mesaCtrl.mesaOcupada = (id) => (
 
 );
 
-mesaCtrl.ocuparMesa = (id) => (
+mesaCtrl.ocuparMesa = (numero) => (
     new Promise((resolve, reject) => {
-        Mesa.findOneAndUpdate({ _id: id }, { estado: "Ocupada" }, (err, mesaDB) => {
+        Mesa.findOneAndUpdate({ numero: numero }, { estado: "Ocupada" }, (err, mesaDB) => {
             if (err) {
                 return res.status(400).json({
                     ok: false,
@@ -81,9 +81,9 @@ mesaCtrl.ocuparMesa = (id) => (
     })
 )
 
-mesaCtrl.liberarMesa = (id) => (
+mesaCtrl.liberarMesa = (numero) => (
     new Promise((resolve, reject) => {
-        Mesa.findOneAndUpdate({ _id: id }, { estado: "Libre" }, { new: true }, (err, mesaDB) => {
+        Mesa.findOneAndUpdate({ numero: numero }, { estado: "Libre" }, { new: true }, (err, mesaDB) => {
             if (err) {
                 relsove("error");
             }
@@ -93,6 +93,22 @@ mesaCtrl.liberarMesa = (id) => (
     })
 )
 
+mesaCtrl.cargarMesas = (req, res) => {
+
+    Mesa.find({ estado: "Libre" }, (err, mesaDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            ok: true,
+            mesaDB
+        });
+    });
+}
 
 
 

@@ -24,7 +24,7 @@ pedidoCtrl.getPedido = async(req, res) => {
     Pedido.findById({ _id: id })
         .populate('usuario')
         .populate('sesion')
-        .populate('linea_pedido.platos')
+        .populate('linea_pedido.plato')
         .exec((err, pedidoDB) => {
             if (err) {
                 return res.status(400).json({
@@ -39,6 +39,50 @@ pedidoCtrl.getPedido = async(req, res) => {
             })
         })
 
+}
+pedidoCtrl.getPedidoCurso = async(req, res) => {
+
+    let fecha = new Date().toDateString();
+    let usuario = req.params.usuario;
+
+
+    Pedido.find({ usuario: usuario, fecha: fecha })
+        .populate('linea_pedido.plato')
+        .exec((err, pedidoDB) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    error: err.message
+                });
+            }
+
+            res.json({
+                ok: true,
+                pedidoDB
+            })
+        })
+
+}
+
+pedidoCtrl.getHistorial = async(req, res) => {
+
+    let usuario = req.params.usuario;
+
+    Pedido.find({ usuario: usuario })
+        .populate('linea_pedido.plato')
+        .exec((err, pedidosDB) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    error: err.message
+                });
+            }
+
+            res.json({
+                ok: true,
+                pedidosDB
+            })
+        })
 }
 
 module.exports = pedidoCtrl;

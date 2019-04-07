@@ -18,7 +18,7 @@ const pedidoSchema = new Schema({
         required: true
     },
     linea_pedido: [{
-        platos: {
+        plato: {
             type: Schema.Types.ObjectId,
             ref: 'Plato'
         },
@@ -43,9 +43,16 @@ const pedidoSchema = new Schema({
         type: Boolean,
         default: false
     },
+    total: {
+        type: Number,
+    },
     fecha: {
-        type: Date,
-        default: new Date()
+        type: String,
+        default: new Date().toDateString()
+    },
+    hora: {
+        type: String,
+        default: new Date().toTimeString()
     }
 });
 

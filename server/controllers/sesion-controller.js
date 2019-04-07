@@ -1,4 +1,5 @@
 const Sesion = require('../models/sesion-model');
+const Mesa = require('../models/mesa-model');
 const Usuario = require('../models/usuario-model');
 const sesionCtrl = {};
 const usuarioCtrl = require('../controllers/usuario-controller');
@@ -98,7 +99,7 @@ sesionCtrl.cerrarSesion = async(req, res) => {
             })
         }
 
-    )
+    );
 
     let liberarMesa = await mesaCtrl.liberarMesa(body.mesa);
     let cierraSesion = await cerrar;
@@ -108,6 +109,35 @@ sesionCtrl.cerrarSesion = async(req, res) => {
     })
 
 };
+
+sesionCtrl.liberar = async(req, res) => {
+    let cerrarSesiones = new Promise((resolve, reject) => {
+        Sesion.updateMany({ estado: "Abierta" }, { estado: "Cerrada" }, { new: true }, (err, sesionDB) => {
+            if (err) {
+                reject(err)
+            }
+
+            resolve(sesionDB)
+        })
+    });
+
+    let liberarMesas = new Promise((resolve, reject) => {
+        Mesa.updateMany({ estado: "Ocupada" }, { estado: "Libre" }, { new: true }, (err, mesaDB) => {
+            if (err) {
+                reject(err)
+            }
+
+            resolve(mesaDB)
+        })
+    });
+
+    res.json({
+        ok: true,
+        mesas: await liberarMesas,
+        sesiones: await cerrarSesiones
+    })
+
+}
 
 // sesionCtrl.cierraSesion = (id) =>(
 //     new Promise(

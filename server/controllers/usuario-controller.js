@@ -47,7 +47,7 @@ usuarioCtrl.registroAnonimo = async(req, res) => {
 usuarioCtrl.login = (req, res) => {
     let login = req.body;
 
-    Usuario.find({ email: login.email, pass: login.pass }, (err, usuarioDB) => {
+    Usuario.findOne({ email: login.email, pass: login.pass }, (err, usuarioDB) => {
         if (err) {
             return res.status(400).json({
                 ok: false,
@@ -55,7 +55,7 @@ usuarioCtrl.login = (req, res) => {
             });
         }
 
-        if (usuarioDB.length == 0) {
+        if (usuarioDB == undefined) {
             res.json({
                 ok: false
             });
@@ -73,7 +73,7 @@ usuarioCtrl.login = (req, res) => {
 //usuario/:id
 usuarioCtrl.getUsuario = async(req, res) => {
     let _id = req.params.id;
-
+    console.log(_id);
     await Usuario.findById({ _id }, (err, usuarioDB) => {
         if (err) {
             return res.status(400).json({
@@ -81,7 +81,10 @@ usuarioCtrl.getUsuario = async(req, res) => {
                 error: err.message
             });
         }
-        res.json(usuarioDB)
+        res.json({
+            ok: true,
+            usuarioDB
+        })
 
     });
 };
@@ -103,6 +106,22 @@ usuarioCtrl.getUsuarios = async(req, res) => {
 };
 
 usuarioCtrl.updateUsuario = (req, res) => {
+    let usuario = new Usuario(req.body);
+    //console.log(usuario._id);
+
+    Usuario.findOneAndUpdate({ _id: usuario._id }, { $set: { nombre: usuario.nombre, email: usuario.email, telefono: usuario.telefono, pass: usuario.pass } }, { new: true }, (err, usuarioDB) => {
+
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                error: err.message
+            });
+        }
+        res.json({
+            ok: true,
+            usuarioDB
+        })
+    });
 
 };
 

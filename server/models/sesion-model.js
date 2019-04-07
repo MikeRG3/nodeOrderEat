@@ -4,8 +4,7 @@ const { Schema } = mongoose;
 
 const sesionSchema = new Schema({
     mesa: {
-        type: Schema.Types.ObjectId,
-        ref: 'Mesa',
+        type: String,
         required: true
     },
     usuario: {
