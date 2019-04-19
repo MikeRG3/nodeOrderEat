@@ -31,6 +31,9 @@ const PlatoSchema = new Schema({
         type: String
 
     },
+    // imagen: {
+    //     type: String
+    // },
     imagenes: [{
         type: String
     }],

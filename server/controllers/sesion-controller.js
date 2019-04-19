@@ -26,6 +26,27 @@ sesionCtrl.getSesion = async(req, res) => {
 
 };
 
+//Devuelve la sesion activa de una mesa en concreto
+sesionCtrl.getSesionMesa = async(req, res) => {
+    let mesa = req.params.mesa;
+
+    Sesion.findOne({ 'mesa': mesa, 'estado': 'Abierta' })
+
+    .exec((err, sesionDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            ok: true,
+            sesionDB
+        })
+    })
+
+};
 sesionCtrl.crearSesion = async(req, res) => {
     let body = req.body;
 
@@ -109,8 +130,9 @@ sesionCtrl.cerrarSesion = async(req, res) => {
     })
 
 };
-
+//Cierra sesiones abiertas y libera mesas ocupadas
 sesionCtrl.liberar = async(req, res) => {
+
     let cerrarSesiones = new Promise((resolve, reject) => {
         Sesion.updateMany({ estado: "Abierta" }, { estado: "Cerrada" }, { new: true }, (err, sesionDB) => {
             if (err) {
@@ -138,6 +160,69 @@ sesionCtrl.liberar = async(req, res) => {
     })
 
 }
+sesionCtrl.liberarMesa = async(req, res) => {
+    let mesa = req.params.mesa;
+
+    let cerrarSesiones = new Promise((resolve, reject) => {
+        Sesion.update({ estado: "Abierta", mesa: mesa }, { estado: "Cerrada" }, { new: true }, (err, sesionDB) => {
+            if (err) {
+                reject(err)
+            }
+
+            resolve(sesionDB)
+        })
+    });
+
+    let liberarMesas = new Promise((resolve, reject) => {
+        Mesa.update({ numero: mesa }, { estado: "Libre" }, { new: true }, (err, mesaDB) => {
+            if (err) {
+                reject(err)
+            }
+
+            resolve(mesaDB)
+        })
+    });
+
+    res.json({
+        ok: true,
+        mesas: await liberarMesas,
+        sesiones: await cerrarSesiones
+    })
+
+}
+
+
+//comprueba sesion activa del usuario
+sesionCtrl.compruebaSesion = async(req, res) => {
+
+    let usuario = req.params.usuario;
+
+    Sesion.findOne({ usuario: usuario, estado: "Abierta" }, (err, sesionDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                error: err.message
+            });
+        }
+
+        let existe;
+        if (sesionDB == null) {
+            existe = false;
+        } else {
+            existe = true;
+        }
+
+        res.json({
+            ok: true,
+            existe,
+            sesionDB
+        })
+    });
+
+
+}
+
+
 
 // sesionCtrl.cierraSesion = (id) =>(
 //     new Promise(

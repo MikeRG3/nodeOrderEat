@@ -6,7 +6,7 @@ const FileSystem = require('../classes/FileSystem');
 //carta
 platoCtrl.crearPlato = async(req, res) => {
     plato = new Plato(req.body);
-
+    console.log(plato);
     subirImagen(req.files, plato._id + "").then(() => {
             const fileSystem = new FileSystem();
             const imagenes = fileSystem.imagenesaPost(plato._id + "");
@@ -40,7 +40,7 @@ platoCtrl.crearPlato = async(req, res) => {
 };
 
 function subirImagen(archivo, platoId) {
-
+    console.log(archivo.imagenes);
     return new Promise(async(resolve, reject) => {
 
         if (!archivo) {
@@ -51,7 +51,7 @@ function subirImagen(archivo, platoId) {
             reject("No se subió ningun archivo");
         }
 
-        const file = archivo.image;
+        const file = archivo.imagenes;
 
         if (!file) {
 
@@ -126,7 +126,7 @@ platoCtrl.getPlato = async(req, res) => {
 
 //Sacamos todas las categorias de los platos segun Orden
 platoCtrl.categoriaOrden = async(req, res) => {
-    console.log("entra????");
+
     await Plato.distinct("categoria.orden", (err, orden) => {
         if (err) {
             return res.status(400).json({

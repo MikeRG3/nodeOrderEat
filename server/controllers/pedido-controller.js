@@ -40,9 +40,33 @@ pedidoCtrl.getPedido = async(req, res) => {
         })
 
 }
+
+
+//Muestra los pedidos realizados en una misma sesion
+pedidoCtrl.getPedidoSesion = async(req, res) => {
+    let sesion = req.params.sesion;
+    Pedido.find({ sesion })
+        .populate('linea_pedido.plato')
+        .exec((err, pedidoDB) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    error: err.message
+                });
+            }
+
+            res.json({
+                ok: true,
+                pedidoDB
+            })
+        })
+
+}
+
+
 pedidoCtrl.getPedidoCurso = async(req, res) => {
 
-    let fecha = new Date().toDateString();
+    let fecha = new Date().toLocaleDateString();
     let usuario = req.params.usuario;
 
 

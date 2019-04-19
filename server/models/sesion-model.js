@@ -18,8 +18,12 @@ const sesionSchema = new Schema({
         default: 'Abierta'
     },
     fecha: {
-        type: Date,
-        default: new Date()
+        type: String,
+        default: new Date().toLocaleDateString()
+    },
+    hora: {
+        type: String,
+        default: new Date().toLocaleTimeString()
     }
 
 });

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const Plato = mongoose.model("Plato")
+
 
 const UsuarioSchema = new Schema({
     nombre: {
@@ -35,14 +35,12 @@ const UsuarioSchema = new Schema({
             // ,
             // required: [true, 'Contraseña requerida']
     },
-    favoritos: [{
-
+    favoritos: {
         plato: {
-            type: Schema.ObjectId,
-            ref: "cartas"
+            type: Schema.Types.ObjectId,
+            ref: 'Plato'
         }
-
-    }],
+    },
     pago: {
 
     }

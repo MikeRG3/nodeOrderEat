@@ -12,6 +12,11 @@ router.post('/login', usuarioCtrl.login);
 router.get('/', usuarioCtrl.getUsuarios);
 router.get('/:id', usuarioCtrl.getUsuario);
 
+router.get('/favs/:usuario', usuarioCtrl.getFav);
+router.post('/favs', usuarioCtrl.updateFav);
+
+
+
 
 
 module.exports = router;

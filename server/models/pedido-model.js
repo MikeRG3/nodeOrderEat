@@ -48,11 +48,11 @@ const pedidoSchema = new Schema({
     },
     fecha: {
         type: String,
-        default: new Date().toDateString()
+        default: new Date().toLocaleDateString()
     },
     hora: {
         type: String,
-        default: new Date().toTimeString()
+        default: new Date().toLocaleTimeString()
     }
 });
 
