@@ -73,23 +73,23 @@ usuarioCtrl.login = (req, res) => {
 //usuario/:id
 usuarioCtrl.getUsuario = async(req, res) => {
     let _id = req.params.id;
-    
-    await Usuario.findById({ _id })
-                .populate('favoritos')
-                .exec( (err, usuarioDB) => {
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                error: err.message
-            });
-        }
-        console.log(usuarioDB);
-        res.json({
-            ok: true,
-            usuarioDB
-        })
 
-    });
+    await Usuario.findById({ _id })
+        .populate('favoritos')
+        .exec((err, usuarioDB) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    error: err.message
+                });
+            }
+            console.log(usuarioDB);
+            res.json({
+                ok: true,
+                usuarioDB
+            })
+
+        });
 };
 
 
@@ -127,33 +127,33 @@ usuarioCtrl.updateUsuario = (req, res) => {
     });
 
 };
-usuarioCtrl.getFav = async (req, res)=>{
-   
+usuarioCtrl.getFav = async(req, res) => {
+
     let usuario = req.params.usuario;
 
-    Usuario.findById({_id:usuario})
-            //.populate('favoritos')
-            .exec((err,usuarioDB)=>{
-        if (err) {
-            return res.status(400).json({
-                ok: false,
-                error: err.message
-            });
-        }
-       
-        res.json({
-            ok: true,
-            favoritos: usuarioDB.favoritos
+    Usuario.findById({ _id: usuario })
+        //.populate('favoritos')
+        .exec((err, usuarioDB) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    error: err.message
+                });
+            }
+
+            res.json({
+                ok: true,
+                favoritos: usuarioDB.favoritos
+            })
         })
-    })
 }
 
-usuarioCtrl.updateFav = async (req, res)=>{
+usuarioCtrl.updateFav = async(req, res) => {
     let usuario = req.body.usuario;
     let favoritos = req.body.favoritos;
     console.log(favoritos);
-    
-    Usuario.findOneAndUpdate({_id:usuario} , {$set:{"favoritos": favoritos}} , {new:true} , (err,usuarioDB)=>{
+
+    Usuario.findOneAndUpdate({ _id: usuario }, { $set: { "favoritos": favoritos } }, { new: true }, (err, usuarioDB) => {
         if (err) {
             return res.status(400).json({
                 ok: false,

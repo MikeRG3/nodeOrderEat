@@ -6,7 +6,8 @@ const FileSystem = require('../classes/FileSystem');
 //carta
 platoCtrl.crearPlato = async(req, res) => {
     plato = new Plato(req.body);
-    console.log(plato);
+    console.log(req.body);
+
     subirImagen(req.files, plato._id + "").then(() => {
             const fileSystem = new FileSystem();
             const imagenes = fileSystem.imagenesaPost(plato._id + "");
@@ -39,15 +40,79 @@ platoCtrl.crearPlato = async(req, res) => {
 
 };
 
+platoCtrl.modificarPlato = async(req, res) => {
+
+    plato = new Plato(req.body);
+
+    let update = {
+        $set: {
+            nombre: plato.nombre,
+            precio: plato.precio,
+            descripcion: plato.descripcion,
+            menu: plato.menu,
+            sugerencia: plato.sugerencia,
+            "categoria.orden": plato.categoria.orden,
+            "categoria.tipo": plato.categoria.tipo
+
+        }
+    };
+    if (req.files) {
+        console.log("Sube imagen");
+        subirImagen(req.files, plato._id + "").then(() => {
+                const fileSystem = new FileSystem();
+                const imagenes = fileSystem.imagenesaPost(plato._id + "");
+
+                update.$set.imagenes = imagenes;
+                console.log(update);
+
+                Plato.findOneAndUpdate({ _id: plato._id }, update, { new: true }, (err, platoDB) => {
+                    if (err) {
+                        return res.status(400).json({
+                            ok: false,
+                            error: err.message
+                        });
+                    }
+
+                    res.json({
+                        ok: true,
+                        platoDB
+                    });
+
+                })
+            })
+            .catch((err) => {
+
+                res.status(400).json({
+                    ok: false,
+                    error: err.message
+                });
+            });
+    } else {
+
+        Plato.findOneAndUpdate({ _id: plato._id }, update, { returnNewDocument: true }, (err, platoDB) => {
+            if (err) {
+                return res.status(400).json({
+                    ok: false,
+                    error: err.message
+                });
+            }
+
+            res.json({
+                ok: true,
+                platoDB
+            });
+
+        })
+    }
+
+};
+
 function subirImagen(archivo, platoId) {
     console.log(archivo.imagenes);
     return new Promise(async(resolve, reject) => {
 
         if (!archivo) {
-            // return res.status(400).json({
-            //     ok: false,
-            //     mensaje: 'No se subió ningun archivo'
-            // });
+
             reject("No se subió ningun archivo");
         }
 
@@ -72,19 +137,40 @@ function subirImagen(archivo, platoId) {
 
 }
 
-platoCtrl.getImagen = async(req, res) => {
-        platoId = req.query.id;
-        img = req.query.img;
-        const fileSystem = new FileSystem();
-        pathImg = fileSystem.getImg(platoId, img);
-        console.log(pathImg);
-        // res.json({
-        //         img: pathImg
-        //     })
-        res.sendFile(pathImg);
+platoCtrl.eliminarPlato = async(req, res) => {
+    let plato = req.body;
+    const fileSystem = new FileSystem();
+    console.log(plato);
+    fileSystem.borrarDirectorio(plato._id);
 
-    }
-    //carta/
+    Plato.findByIdAndDelete({ _id: plato._id }, (err, platoDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            ok: true,
+            platoDB
+        });
+    })
+}
+
+platoCtrl.getImagen = async(req, res) => {
+    platoId = req.query.id;
+    img = req.query.img;
+    const fileSystem = new FileSystem();
+    pathImg = fileSystem.getImg(platoId, img);
+    console.log(pathImg);
+    // res.json({
+    //         img: pathImg
+    //     })
+    res.sendFile(pathImg);
+
+}
+
 
 platoCtrl.getPlatos = async(req, res) => {
 
@@ -162,37 +248,60 @@ platoCtrl.categoriaTipo = async(req, res) => {
 
 //Plato por categoria
 platoCtrl.platosCategoria = async(req, res) => {
-        let categoria = req.query.categoria;
-        console.log(req.query);
-        await Plato.find({ $or: [{ "categoria.orden": categoria }, { "categoria.tipo": categoria }] }, (err, platoDB) => {
+    let categoria = req.query.categoria;
+    console.log(req.query);
+    await Plato.find({ $or: [{ "categoria.orden": categoria }, { "categoria.tipo": categoria }] }, (err, platoDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            ok: true,
+            platoDB
+        });
+    })
+}
+
+platoCtrl.getMenu = async(req, res) => {
+
+
+    await Plato.find({ menu: true })
+        .sort({ 'categoria.orden': 1 })
+        .exec((err, platoDB) => {
             if (err) {
                 return res.status(400).json({
                     ok: false,
                     error: err.message
                 });
             }
-
+            console.log(platoDB);
             res.json({
                 ok: true,
                 platoDB
             });
         })
-    }
-    // platoCtrl.platoTipo = async(req, res) => {
-    //     let categoria = req.query.tipo;
-    //     console.log(req.query);
-    //     await Plato.find({ "categoria.tipo": categoria }, (err, platoDB) => {
-    //         if (err) {
-    //             return res.status(400).json({
-    //                 ok: false,
-    //                 error: err.message
-    //             });
-    //         }
+}
 
-//         res.json({
-//             ok: true,
-//             platoDB
-//         });
-//     })
-// }
+platoCtrl.getSugerencias = async(req, res) => {
+
+    await Plato.find({ sugerencia: true }, (err, platoDB) => {
+        if (err) {
+            return res.status(400).json({
+                ok: false,
+                error: err.message
+            });
+        }
+
+        res.json({
+            ok: true,
+            platoDB
+        });
+    })
+}
+
+
+
 module.exports = platoCtrl;

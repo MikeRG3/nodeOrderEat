@@ -1,6 +1,8 @@
 const _path = require('path');
 const fs = require('fs');
 const uniqid = require('uniqid');
+//Borrar directorios no vacios
+const rimraf = require("rimraf");
 
 class FileSystem {
 
@@ -34,8 +36,12 @@ class FileSystem {
         const pathPlato = _path.resolve(__dirname, '../uploads', platoId);
         const pathPlatoTemp = pathPlato + '/temp';
 
-        const existe = fs.existsSync(pathPlato);
+        //Borra el directorio
+        rimraf.sync(_path.resolve(__dirname, '../uploads', platoId, 'posts'))
 
+
+        const existe = fs.existsSync(pathPlato);
+        console.log(existe);
         if (!existe) {
             fs.mkdirSync(pathPlato);
             fs.mkdirSync(pathPlatoTemp);
@@ -43,7 +49,11 @@ class FileSystem {
 
         return pathPlatoTemp;
     }
+    borrarDirectorio(platoId) {
+        console.log(_path.resolve(__dirname, '../uploads', platoId));
+        rimraf.sync(_path.resolve(__dirname, '../uploads', platoId))
 
+    }
     generarNombre(nombreOriginal) {
 
         const nombreArray = nombreOriginal.split('.');
